@@ -45,4 +45,6 @@ def CostFunctionPrime(X, Y):
     while CostFunction(X, Y) > 0.0005:
         w1 += -0.03*dJdW1
         w2 += -0.03*dJdW2
+        delta3 = np.multiply((-(Y - yhat)), SigmoidPrime(z3))
+        dJdW2 = np.dot(a2.T, delta3)
     return w1, w2
