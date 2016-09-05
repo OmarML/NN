@@ -60,16 +60,35 @@ class NeuralNetwork(object):
         return map(np.transpose, self.weights)
 
     def CalculateErrors(self, X, Y):
-        delta = Y - self.Forward(X)
+        delta = (-(Y - self.Forward(X)))*(self.GetZPrimeValues()[-1])
         deltas = []
-        for i in range(1, len(self.TransposeWeights()))[::-1]:
-            delta = np.dot((self.TransposeWeights()[i]*delta), self.GetZPrimeValues()[i])
+        deltas.append(delta)
+        t = len(self.GetZPrimeValues()) - 1
+        for i in range(len(self.TransposeWeights()[1:]))[::-1]:
+            delta = (np.dot(delta, self.TransposeWeights()[1:][i])) * self.GetZPrimeValues()[0:t][i]
             deltas.append(delta)
         return deltas
+
+    def GetActivationsTransposed(self, X):
+        new_X = self.Logistic(np.dot(X, self.weights[0]))
+        a = [X, self.Logistic(np.dot(X, self.weights[0]))]
+        for i in self.weights[1:]:
+            new_X = np.dot(new_X, i)
+            new_X = self.Logistic(new_X)
+            a.append(new_X)
+        return map(np.transpose, a)
+
+    def UpdateWeights(self, X, Y):
+        t = len(self.GetActivationsTransposed(X)) - 1
+        new_act = self.GetActivationsTransposed(X)[::-1][0:t]
+        y = a.CalculateErrors(X, Y)
+        return [np.dot(new_act[i], y[i]) for i in range(len(y))]
+
 
 a = NeuralNetwork(2, 1, 3, 3)
 a.CreateWeights()
 a.GetZValues(X)
 a.GetZPrimeValues()
 a.TransposeWeights()
-
+a.CalculateErrors(X, Y)
+a.GetActivationsTransposed(X)
