@@ -1,5 +1,8 @@
 import numpy as np
 
+X = np.array([[0.3,  0.5], [0.5,  0.1], [1.,  0.2]])
+Y = np.array([[0.75], [0.82], [0.93]])
+
 
 class NeuralNetwork(object):
     def __init__(self, InputUnits, OutputUnits, HiddenLayers, HiddenUnits):
@@ -55,16 +58,18 @@ class NeuralNetwork(object):
 
     def TransposeWeights(self):
         return map(np.transpose, self.weights)
-    
-    def CreateWeightZPairs(self):
-        
-        
 
-#    def CalculateErrors(self, X, Y):
-#        initial_delta = Y - self.Forward(X)
-#        deltas = []
-#        for i in self.HiddenLayers:
-#            for i in 
-        
+    def CalculateErrors(self, X, Y):
+        delta = Y - self.Forward(X)
+        deltas = []
+        for i in range(1, len(self.TransposeWeights()))[::-1]:
+            delta = np.dot((self.TransposeWeights()[i]*delta), self.GetZPrimeValues()[i])
+            deltas.append(delta)
+        return deltas
 
 a = NeuralNetwork(2, 1, 3, 3)
+a.CreateWeights()
+a.GetZValues(X)
+a.GetZPrimeValues()
+a.TransposeWeights()
+
