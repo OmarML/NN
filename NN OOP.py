@@ -1,7 +1,8 @@
 import numpy as np
+from scipy.optimize import minimize
 
-X = np.array([[0.3,  0.5], [0.5,  0.1], [1.,  0.2]])
-Y = np.array([[0.75], [0.82], [0.93]])
+X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
+Y = np.array([[0], [0], [0], [1]])
 
 
 class NeuralNetwork(object):
@@ -78,17 +79,25 @@ class NeuralNetwork(object):
             a.append(new_X)
         return map(np.transpose, a)
 
-    def UpdateWeights(self, X, Y):
+    def WeightsDerivative(self, X, Y):
         t = len(self.GetActivationsTransposed(X)) - 1
-        new_act = self.GetActivationsTransposed(X)[::-1][0:t]
-        y = a.CalculateErrors(X, Y)
-        return [np.dot(new_act[i], y[i]) for i in range(len(y))]
+        new_act = (self.GetActivationsTransposed(X)[0:t])[::-1]
+        y = self.CalculateErrors(X, Y)
+        return np.array([np.dot(new_act[i], y[i]) for i in range(len(y))])
 
-
-a = NeuralNetwork(2, 1, 3, 3)
+    def GradientDescent(self, numiter, learning_rate, X, Y):
+        order_deriv = self.WeightsDerivative(X, Y)[::-1]
+        for i in range(numiter):
+            self.weights += -learning_rate * order_deriv
+        return self.Forward(X)
+#            
+#    def UpdateWeights(self):
+#        res = minimize(self.CostFunction(X, Y), method='BFGS', jac=self.WeightsDerivative(X, Y))
+a = NeuralNetwork(2, 1, 1, 3)
 a.CreateWeights()
 a.GetZValues(X)
 a.GetZPrimeValues()
 a.TransposeWeights()
 a.CalculateErrors(X, Y)
 a.GetActivationsTransposed(X)
+a.WeightsDerivative(X, Y)
